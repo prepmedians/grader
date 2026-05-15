@@ -1,0 +1,482 @@
+{
+  "name": "Scantron2",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ece4e1a0-7430-4517-994f-250f34954854",
+              "name": "sheet_type",
+              "value": "ACT",
+              "type": "string"
+            },
+            {
+              "id": "5d519768-8b3d-4877-8ceb-f287c131243c",
+              "name": "uploaded_at",
+              "value": "={{$now}}",
+              "type": "string"
+            },
+            {
+              "id": "326078f3-cf6a-48f7-87d9-3b920caead8b",
+              "name": "source",
+              "value": "form_upload",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "07084924-56ef-4a9b-a60a-b35edb74e45b",
+      "name": "Set Upload Metadata"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://scantron2-production.up.railway.app/preprocess-omr",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -32
+      ],
+      "id": "5ee03102-2edd-48e3-8dd2-0e96230ce29f",
+      "name": "Preprocess For AI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://scantron2-production.up.railway.app/split-omr",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        -32
+      ],
+      "id": "acb721af-00ae-4bf1-a981-01fcfee49184",
+      "name": "Split OMr"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "blocks",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -32
+      ],
+      "id": "57f35411-9fd7-4015-8b4a-66374f741c78",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "image",
+        "binaryPropertyName": "block_file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        -32
+      ],
+      "id": "f21ce777-8cfe-4245-b398-6b89cc834b25",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1696,
+        -16
+      ],
+      "id": "40fe0204-7c59-4744-bae0-c3858883fa4f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const section = $json.section;\nconst column = Number($json.column); // FIX: ensure number\n\nlet expected_count = 10;\n\nif (section === \"english\") {\n  expected_count = 10;\n} else if (section === \"math\") {\n  expected_count = column === 5 ? 5 : 10;\n} else if (section === \"reading\") {\n  expected_count = column === 5 ? 4 : 8;\n} else if (section === \"science\") {\n  expected_count = 8; // all columns are 8\n}\n\nreturn [{\n  json: {\n    ...$json,\n    column, // ensure downstream consistency\n    expected_count\n  },\n  binary: $binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        48
+      ],
+      "id": "61f22a6e-0b4c-467c-802a-2fc22b658313",
+      "name": "Pre"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Extract all text from model output\nlet text = $json.content?.map(c => c.text).join(\"\\n\") || \"\";\n\n// 2. Remove markdown fences\ntext = text\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// 3. Try extracting JSON\nconst match = text.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  return [{\n    json: { ...$json, valid: false },\n    binary: $binary\n  }];\n}\n\ntry {\n  const parsed = JSON.parse(match[0]);\n\n  // 4. Only check basic structure\n  if (!Array.isArray(parsed.answers)) {\n    throw new Error(\"No answers array\");\n  }\n\n  // 5. SUCCESS (no strict checks)\n  return [{\n    json: {\n      ...$json,\n      answers: parsed.answers,\n      valid: true\n    },\n    binary: $binary\n  }];\n\n} catch (e) {\n  return [{\n    json: { ...$json, valid: false },\n    binary: $binary\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2528,
+        48
+      ],
+      "id": "032b7f73-a19d-4874-9d1d-3e75d5acf955",
+      "name": "Validate + Parse"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6fbcf775-adb9-4d0a-b662-d72519fb5154",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2720,
+        64
+      ],
+      "id": "d2f69a17-b7ee-41f0-8e78-a1ed1318a1bf",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-7",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-7"
+        },
+        "text": "=You are an OMR scanner.\n\nYou MUST decide based on darkness threshold.\n\nFor each row:\n1. Compare all 4 bubbles.\n2. A bubble is VALID only if it is SIGNIFICANTLY darker than the others.\n\nCRITICAL RULE:\n- If no bubble is clearly darker than the rest → return null\n- If all bubbles look similar → return null\n- If shading is uniform or faint → return null\n- NEVER guess\n\nSTRICT:\n- Prefer null over guessing\n- If unsure → null\n\nDO NOT:\n- infer patterns\n- assume an answer exists\n- try to distribute answers evenly\n\nEach row is independent.\n\nOutput:\n- 1 = leftmost\n- 2 = second\n- 3 = third\n- 4 = rightmost\n- null = no clear mark\n\nReturn ONLY JSON:\n{\"answers\":[...]}",
+        "inputType": "binary",
+        "binaryPropertyName": "=block_file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        48
+      ],
+      "id": "6afa9080-71e5-4b4a-baad-bbc163aa2933",
+      "name": "Analyze image",
+      "credentials": {
+        "anthropicApi": {
+          "id": "e1ZvH7vjvR4qwrjt",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    _binary_backup: $binary   // store it safely\n  },\n  binary: $binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        48
+      ],
+      "id": "9944779b-cfbf-4722-9408-533c099beff7",
+      "name": "Preserve Binary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction initArray(size) {\n  return Array(size).fill(null);\n}\n\n// exact section sizes\nlet result = {\n  english: initArray(50),\n  math: initArray(45),\n  reading: initArray(36),\n  science: initArray(40)\n};\n\nitems.forEach((item, index) => {\n  const answers = item.json.answers;\n  if (!answers) return;\n\n  let section, start;\n\n  // ENGLISH (runs 0–4)\n  if (index < 5) {\n    section = \"english\";\n    start = index * 10;\n  }\n\n  // MATH (runs 5–9)\n  else if (index < 10) {\n    section = \"math\";\n    const col = index - 5;\n\n    if (col < 4) start = col * 10;\n    else start = 40; // last column (5 questions)\n  }\n\n  // READING (runs 10–14)\n  else if (index < 15) {\n    section = \"reading\";\n    const col = index - 10;\n\n    if (col < 4) start = col * 8;\n    else start = 32;\n  }\n\n  // SCIENCE (runs 15–19)\n  else if (index < 20) {\n    section = \"science\";\n    const col = index - 15;\n\n    start = col * 8;\n  }\n\n  // place answers safely\n  answers.forEach((ans, i) => {\n    const pos = start + i;\n\n    if (pos < result[section].length) {\n      result[section][pos] = ans;\n    }\n  });\n});\n\nreturn [{\n  json: result\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2224,
+        -128
+      ],
+      "id": "68d9113e-20ca-495a-af85-03a72c09ad66",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const retry = ($json.retry_count || 0) + 1;\n\nif (retry >= 3) {\n  throw new Error(\"Max retries reached\");\n}\n\nreturn [{\n  json: {\n    ...$json,\n    retry_count: retry\n  },\n  binary: $binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        96
+      ],
+      "id": "002a99a0-983f-4a8b-8509-3f2850885feb",
+      "name": "Retry Counter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "omr-upload",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "binaryPropertyName": "file"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "cfb178d8-4888-4e3e-8f3c-355d8a5f7c7d",
+      "name": "Webhook",
+      "webhookId": "78d1dc34-a163-438f-9762-23910060c2eb"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2432,
+        -128
+      ],
+      "id": "f6a63a61-6b4b-4ee1-9dbd-d24cf271c157",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set Upload Metadata": {
+      "main": [
+        [
+          {
+            "node": "Preprocess For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess For AI": {
+      "main": [
+        [
+          {
+            "node": "Split OMr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split OMr": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pre": {
+      "main": [
+        [
+          {
+            "node": "Preserve Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate + Parse": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Validate + Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Binary": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Counter": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Upload Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3048ab65-202a-457a-88fa-4df659d59af0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "69db981823e871cc1f7291cc5cfb350595a9497957a5682486a4e05f9dae8215"
+  },
+  "id": "14B1lGZPoMHukyUc",
+  "tags": []
+}
