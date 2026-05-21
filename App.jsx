@@ -3983,6 +3983,256 @@ export default function App() {
           </div>
         ) : null}
 
+        {isAdminAuthenticated && isAdminOpen ? (
+          <section className="panel-card admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <h2 className="admin-panel-title">Admin Panel</h2>
+                <p className="admin-panel-subtitle">Manage tests, students, and results</p>
+              </div>
+              <button type="button" className="quiet-button" onClick={loadEducatorData}>Refresh</button>
+            </div>
+
+            <div className="admin-tabs">
+              <button className={`admin-tab ${educatorTab === "overview" ? "active" : ""}`} onClick={() => setEducatorTab("overview")}>Overview</button>
+              <button className={`admin-tab ${educatorTab === "tests" ? "active" : ""}`} onClick={() => setEducatorTab("tests")}>Test Setup</button>
+              <button className={`admin-tab ${educatorTab === "students" ? "active" : ""}`} onClick={() => setEducatorTab("students")}>Students</button>
+              <button className={`admin-tab ${educatorTab === "results" ? "active" : ""}`} onClick={() => setEducatorTab("results")}>Results</button>
+            </div>
+
+            {educatorLoading ? (
+              <p className="helper-text">Loading data...</p>
+
+            ) : educatorTab === "overview" ? (
+              <>
+                <div className="admin-kpi-grid">
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{educatorAnalytics?.totalStudents ?? "\u2014"}</div>
+                    <div className="admin-kpi-label">Students</div>
+                  </div>
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{educatorAnalytics?.totalScans ?? "\u2014"}</div>
+                    <div className="admin-kpi-label">Total Scans</div>
+                  </div>
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{savedTests.length || availableTests.length}</div>
+                    <div className="admin-kpi-label">Tests</div>
+                  </div>
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">
+                      {educatorAnalytics?.avgScores
+                        ? (() => {
+                            const vals = Object.values(educatorAnalytics.avgScores).filter(Boolean);
+                            return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : "\u2014";
+                          })()
+                        : "\u2014"}
+                    </div>
+                    <div className="admin-kpi-label">Avg Score</div>
+                  </div>
+                </div>
+
+                {educatorAnalytics?.avgScores && Object.values(educatorAnalytics.avgScores).some(Boolean) ? (
+                  <>
+                    <p className="admin-section-title">Average Scaled Scores</p>
+                    <div className="admin-scores-grid">
+                      {[["english","English"],["math","Math"],["reading","Reading"],["science","Science"]].map(([key, label]) => (
+                        <div key={key} className="admin-score-card">
+                          <div className="admin-score-section">{label}</div>
+                          <div className="admin-score-value">{educatorAnalytics.avgScores[key] ?? "\u2014"}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="helper-text">No scored results yet. Scores appear once students submit tests.</p>
+                )}
+
+                {educatorAnalytics?.scansPerWeek?.length > 0 ? (
+                  <>
+                    <p className="admin-section-title">Scans per Week</p>
+                    {(() => {
+                      const maxCount = Math.max(...educatorAnalytics.scansPerWeek.map((w) => w.count), 1);
+                      return educatorAnalytics.scansPerWeek.map((w) => (
+                        <div key={w.week} className="admin-week-row">
+                          <span style={{ minWidth: 90, color: "var(--muted)", fontSize: "0.82rem" }}>{w.week}</span>
+                          <div className="admin-week-bar" style={{ width: `${(w.count / maxCount) * 100}%` }} />
+                          <strong style={{ minWidth: 30, textAlign: "right" }}>{w.count}</strong>
+                        </div>
+                      ));
+                    })()}
+                  </>
+                ) : null}
+              </>
+
+            ) : educatorTab === "tests" ? (
+              <>
+                {!isAdminAuthenticated ? (
+                  <form className="stack" onSubmit={handleAdminLogin} style={{ maxWidth: 400 }}>
+                    <p className="helper-text">Sign in with admin credentials to manage tests.</p>
+                    <div className="field">
+                      <label htmlFor="admin-username">Username</label>
+                      <input id="admin-username" name="username" className="text-input" type="text" value={adminCredentials.username} onChange={handleAdminCredentialChange} placeholder="Username" />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="admin-password">Password</label>
+                      <input id="admin-password" name="password" className="text-input" type="password" value={adminCredentials.password} onChange={handleAdminCredentialChange} placeholder="Password" />
+                    </div>
+                    {adminError ? <div className="message error">{adminError}</div> : null}
+                    <div className="button-row">
+                      <button type="submit" className="primary-button">Sign In</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="admin-setup-grid">
+                    <div className="stack">
+                      <p className="admin-section-title">Add New Test</p>
+                      <form className="stack" onSubmit={handleSaveTest}>
+                        <div className="field">
+                          <label htmlFor="test-name">Test name</label>
+                          <input id="test-name" className="text-input" type="text" value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="ACT Practice Test 01" />
+                        </div>
+                        <div className="field">
+                          <label htmlFor="scoring-rubric-upload">Scoring guide PDF</label>
+                          <input key={`scoring-rubric-${adminUploadResetKey}`} id="scoring-rubric-upload" className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => setScoringRubricFile(e.target.files?.[0] || null)} />
+                          <div className="file-name">{scoringRubricFile ? scoringRubricFile.name : "No scoring guide selected"}</div>
+                        </div>
+                        <div className="field">
+                          <label>Study-material PDFs</label>
+                          <div className="stack">
+                            {SECTION_CONFIG.map(({ key, title }) => (
+                              <div key={`rec-${key}`} className="field">
+                                <label htmlFor={`${key}-rec-upload`}>{title}</label>
+                                <input key={`${key}-rec-${adminUploadResetKey}`} id={`${key}-rec-upload`} className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => handleRecommendationFileChange(key, e.target.files?.[0] || null)} />
+                                <div className="file-name">{recommendationFiles[key] ? recommendationFiles[key].name : `No ${title.toLowerCase()} PDF`}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        {adminError ? <div className="message error">{adminError}</div> : null}
+                        {adminSuccess ? <div className="message success">{adminSuccess}</div> : null}
+                        <div className="button-row">
+                          <button type="submit" className="primary-button" disabled={isSavingTest}>{isSavingTest ? "Saving..." : "Save Test"}</button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <div className="stack">
+                      <p className="admin-section-title">Test Library ({savedTests.length || availableTests.length} tests)</p>
+                      {(savedTests.length ? savedTests : availableTests).length ? (
+                        <div className="admin-list">
+                          {(savedTests.length ? savedTests : availableTests).map((test) => (
+                            <div key={test.id} className="admin-test-library-item">
+                              <h3 className="admin-test-library-name">{test.name}</h3>
+                              <div className="admin-test-library-meta">
+                                {formatSavedDate(test.createdAt)}
+                                {test.sourceFilename ? ` \u00b7 ${test.sourceFilename}` : ""}
+                              </div>
+                              <div className="admin-test-library-pills">
+                                {SECTION_CONFIG.map(({ key, title }) => {
+                                  const counts = test.sectionCounts?.[key];
+                                  return (
+                                    <span key={`${test.id}-${key}`} className="admin-test-library-pill">
+                                      {title}: {counts?.total || 0}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="empty-state">No tests yet. Upload a scoring guide to create one.</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+
+            ) : educatorTab === "students" ? (
+              <>
+                {(educatorUsers || []).length ? (
+                  <div className="admin-list">
+                    {educatorUsers.map((u) => (
+                      <div key={u.id} className="admin-list-item">
+                        <div className="admin-list-avatar">
+                          {u.username.slice(0, 1).toUpperCase()}
+                        </div>
+                        <div className="admin-list-info">
+                          <div className="admin-list-name">{u.username}</div>
+                          <div className="admin-list-meta">
+                            {u.email}
+                            {u.lastScan ? ` \u00b7 Last scan: ${new Date(u.lastScan).toLocaleDateString()}` : ""}
+                          </div>
+                        </div>
+                        <div className="admin-list-stat">
+                          <div className="admin-list-stat-value">{u.scanCount}</div>
+                          <div className="admin-list-stat-label">scans</div>
+                        </div>
+                        <select className="role-select" value={u.role} onChange={(e) => handleSetUserRole(u.id, e.target.value)}>
+                          <option value="student">student</option>
+                          <option value="educator">educator</option>
+                        </select>
+                        <span className={`admin-list-badge ${u.role}`}>{u.role}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-state">No students have signed up yet.</div>
+                )}
+              </>
+
+            ) : educatorTab === "results" ? (
+              <>
+                {(educatorResults || []).length ? (
+                  <div className="admin-list">
+                    {educatorResults.map((r) => {
+                      let scores = null;
+                      try { scores = r.scoresJson ? JSON.parse(r.scoresJson) : null; } catch { /* ignore */ }
+                      return (
+                        <div key={r.id} className="admin-result-card">
+                          <div className="admin-result-header">
+                            <div>
+                              <div className="admin-result-student">{r.username}</div>
+                              <div className="admin-result-test">{r.testName || "Unknown test"}</div>
+                            </div>
+                            <div style={{ textAlign: "right" }}>
+                              <div className="admin-result-date">{new Date(r.createdAt).toLocaleDateString()}</div>
+                              <span className="admin-result-source">{r.source}</span>
+                            </div>
+                          </div>
+                          {scores ? (
+                            <div className="admin-result-scores">
+                              {[["english","ENG"],["math","MATH"],["reading","READ"],["science","SCI"]].map(([key, label]) => {
+                                const s = scores[key];
+                                return s?.scaled != null ? (
+                                  <span key={key} className="admin-result-score-pill">
+                                    <span className="section-label">{label}</span>
+                                    <span className="section-value">{s.scaled}</span>
+                                  </span>
+                                ) : null;
+                              })}
+                              {scores.composite != null ? (
+                                <span className="admin-result-score-pill" style={{ background: "var(--accent)", color: "#fff" }}>
+                                  <span className="section-label" style={{ color: "rgba(255,255,255,0.7)" }}>COMP</span>
+                                  <span className="section-value" style={{ color: "#fff" }}>{scores.composite}</span>
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <div className="admin-list-meta">No score data available</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="empty-state">No results yet. Students will appear here after submitting tests.</div>
+                )}
+              </>
+            ) : null}
+          </section>
+        ) : null}
+
         <section ref={uploadRef} className="hero-card">
           <div className="hero-top">
             <span className="eyebrow">Prepmedians ACT Results</span>
@@ -4735,260 +4985,6 @@ export default function App() {
             <div className="empty-state">
               Upload your answer sheet to get your score report and study plan.
             </div>
-          </section>
-        ) : null}
-
-        {isAdminAuthenticated && isAdminOpen ? (
-          <section className="panel-card admin-panel">
-            <div className="admin-panel-header">
-              <div>
-                <h2 className="admin-panel-title">Admin Panel</h2>
-                <p className="admin-panel-subtitle">Manage tests, students, and results</p>
-              </div>
-              <button type="button" className="quiet-button" onClick={loadEducatorData}>Refresh</button>
-            </div>
-
-            <div className="admin-tabs">
-              <button className={`admin-tab ${educatorTab === "overview" ? "active" : ""}`} onClick={() => setEducatorTab("overview")}>Overview</button>
-              <button className={`admin-tab ${educatorTab === "tests" ? "active" : ""}`} onClick={() => setEducatorTab("tests")}>Test Setup</button>
-              <button className={`admin-tab ${educatorTab === "students" ? "active" : ""}`} onClick={() => setEducatorTab("students")}>Students</button>
-              <button className={`admin-tab ${educatorTab === "results" ? "active" : ""}`} onClick={() => setEducatorTab("results")}>Results</button>
-            </div>
-
-            {educatorLoading ? (
-              <p className="helper-text">Loading data...</p>
-
-            ) : educatorTab === "overview" ? (
-              /* ─── Overview Tab ────────────────────────────── */
-              <>
-                <div className="admin-kpi-grid">
-                  <div className="admin-kpi-card">
-                    <div className="admin-kpi-value">{educatorAnalytics?.totalStudents ?? "—"}</div>
-                    <div className="admin-kpi-label">Students</div>
-                  </div>
-                  <div className="admin-kpi-card">
-                    <div className="admin-kpi-value">{educatorAnalytics?.totalScans ?? "—"}</div>
-                    <div className="admin-kpi-label">Total Scans</div>
-                  </div>
-                  <div className="admin-kpi-card">
-                    <div className="admin-kpi-value">{savedTests.length || availableTests.length}</div>
-                    <div className="admin-kpi-label">Tests</div>
-                  </div>
-                  <div className="admin-kpi-card">
-                    <div className="admin-kpi-value">
-                      {educatorAnalytics?.avgScores
-                        ? (() => {
-                            const vals = Object.values(educatorAnalytics.avgScores).filter(Boolean);
-                            return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : "—";
-                          })()
-                        : "—"}
-                    </div>
-                    <div className="admin-kpi-label">Avg Score</div>
-                  </div>
-                </div>
-
-                {educatorAnalytics?.avgScores && Object.values(educatorAnalytics.avgScores).some(Boolean) ? (
-                  <>
-                    <p className="admin-section-title">Average Scaled Scores</p>
-                    <div className="admin-scores-grid">
-                      {[["english","English"],["math","Math"],["reading","Reading"],["science","Science"]].map(([key, label]) => (
-                        <div key={key} className="admin-score-card">
-                          <div className="admin-score-section">{label}</div>
-                          <div className="admin-score-value">{educatorAnalytics.avgScores[key] ?? "—"}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="helper-text">No scored results yet. Scores appear once students submit tests.</p>
-                )}
-
-                {educatorAnalytics?.scansPerWeek?.length > 0 ? (
-                  <>
-                    <p className="admin-section-title">Scans per Week</p>
-                    {(() => {
-                      const maxCount = Math.max(...educatorAnalytics.scansPerWeek.map((w) => w.count), 1);
-                      return educatorAnalytics.scansPerWeek.map((w) => (
-                        <div key={w.week} className="admin-week-row">
-                          <span style={{ minWidth: 90, color: "var(--muted)", fontSize: "0.82rem" }}>{w.week}</span>
-                          <div className="admin-week-bar" style={{ width: `${(w.count / maxCount) * 100}%` }} />
-                          <strong style={{ minWidth: 30, textAlign: "right" }}>{w.count}</strong>
-                        </div>
-                      ));
-                    })()}
-                  </>
-                ) : null}
-              </>
-
-            ) : educatorTab === "tests" ? (
-              /* ─── Test Setup Tab ──────────────────────────── */
-              <>
-                {!isAdminAuthenticated ? (
-                  <form className="stack" onSubmit={handleAdminLogin} style={{ maxWidth: 400 }}>
-                    <p className="helper-text">Sign in with admin credentials to manage tests.</p>
-                    <div className="field">
-                      <label htmlFor="admin-username">Username</label>
-                      <input id="admin-username" name="username" className="text-input" type="text" value={adminCredentials.username} onChange={handleAdminCredentialChange} placeholder="Username" />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="admin-password">Password</label>
-                      <input id="admin-password" name="password" className="text-input" type="password" value={adminCredentials.password} onChange={handleAdminCredentialChange} placeholder="Password" />
-                    </div>
-                    {adminError ? <div className="message error">{adminError}</div> : null}
-                    <div className="button-row">
-                      <button type="submit" className="primary-button">Sign In</button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="admin-setup-grid">
-                    <div className="stack">
-                      <p className="admin-section-title">Add New Test</p>
-                      <form className="stack" onSubmit={handleSaveTest}>
-                        <div className="field">
-                          <label htmlFor="test-name">Test name</label>
-                          <input id="test-name" className="text-input" type="text" value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="ACT Practice Test 01" />
-                        </div>
-                        <div className="field">
-                          <label htmlFor="scoring-rubric-upload">Scoring guide PDF</label>
-                          <input key={`scoring-rubric-${adminUploadResetKey}`} id="scoring-rubric-upload" className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => setScoringRubricFile(e.target.files?.[0] || null)} />
-                          <div className="file-name">{scoringRubricFile ? scoringRubricFile.name : "No scoring guide selected"}</div>
-                        </div>
-                        <div className="field">
-                          <label>Study-material PDFs</label>
-                          <div className="stack">
-                            {SECTION_CONFIG.map(({ key, title }) => (
-                              <div key={`rec-${key}`} className="field">
-                                <label htmlFor={`${key}-rec-upload`}>{title}</label>
-                                <input key={`${key}-rec-${adminUploadResetKey}`} id={`${key}-rec-upload`} className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => handleRecommendationFileChange(key, e.target.files?.[0] || null)} />
-                                <div className="file-name">{recommendationFiles[key] ? recommendationFiles[key].name : `No ${title.toLowerCase()} PDF`}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        {adminError ? <div className="message error">{adminError}</div> : null}
-                        {adminSuccess ? <div className="message success">{adminSuccess}</div> : null}
-                        <div className="button-row">
-                          <button type="submit" className="primary-button" disabled={isSavingTest}>{isSavingTest ? "Saving..." : "Save Test"}</button>
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="stack">
-                      <p className="admin-section-title">Test Library ({savedTests.length || availableTests.length} tests)</p>
-                      {(savedTests.length ? savedTests : availableTests).length ? (
-                        <div className="admin-list">
-                          {(savedTests.length ? savedTests : availableTests).map((test) => (
-                            <div key={test.id} className="admin-test-library-item">
-                              <h3 className="admin-test-library-name">{test.name}</h3>
-                              <div className="admin-test-library-meta">
-                                {formatSavedDate(test.createdAt)}
-                                {test.sourceFilename ? ` \u00b7 ${test.sourceFilename}` : ""}
-                              </div>
-                              <div className="admin-test-library-pills">
-                                {SECTION_CONFIG.map(({ key, title }) => {
-                                  const counts = test.sectionCounts?.[key];
-                                  return (
-                                    <span key={`${test.id}-${key}`} className="admin-test-library-pill">
-                                      {title}: {counts?.total || 0}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="empty-state">No tests yet. Upload a scoring guide to create one.</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-
-            ) : educatorTab === "students" ? (
-              /* ─── Students Tab ────────────────────────────── */
-              <>
-                {(educatorUsers || []).length ? (
-                  <div className="admin-list">
-                    {educatorUsers.map((u) => (
-                      <div key={u.id} className="admin-list-item">
-                        <div className="admin-list-avatar">
-                          {u.username.slice(0, 1).toUpperCase()}
-                        </div>
-                        <div className="admin-list-info">
-                          <div className="admin-list-name">{u.username}</div>
-                          <div className="admin-list-meta">
-                            {u.email}
-                            {u.lastScan ? ` \u00b7 Last scan: ${new Date(u.lastScan).toLocaleDateString()}` : ""}
-                          </div>
-                        </div>
-                        <div className="admin-list-stat">
-                          <div className="admin-list-stat-value">{u.scanCount}</div>
-                          <div className="admin-list-stat-label">scans</div>
-                        </div>
-                        <select className="role-select" value={u.role} onChange={(e) => handleSetUserRole(u.id, e.target.value)}>
-                          <option value="student">student</option>
-                          <option value="educator">educator</option>
-                        </select>
-                        <span className={`admin-list-badge ${u.role}`}>{u.role}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty-state">No students have signed up yet.</div>
-                )}
-              </>
-
-            ) : educatorTab === "results" ? (
-              /* ─── Results Tab ─────────────────────────────── */
-              <>
-                {(educatorResults || []).length ? (
-                  <div className="admin-list">
-                    {educatorResults.map((r) => {
-                      let scores = null;
-                      try { scores = r.scoresJson ? JSON.parse(r.scoresJson) : null; } catch { /* ignore */ }
-                      return (
-                        <div key={r.id} className="admin-result-card">
-                          <div className="admin-result-header">
-                            <div>
-                              <div className="admin-result-student">{r.username}</div>
-                              <div className="admin-result-test">{r.testName || "Unknown test"}</div>
-                            </div>
-                            <div style={{ textAlign: "right" }}>
-                              <div className="admin-result-date">{new Date(r.createdAt).toLocaleDateString()}</div>
-                              <span className="admin-result-source">{r.source}</span>
-                            </div>
-                          </div>
-                          {scores ? (
-                            <div className="admin-result-scores">
-                              {[["english","ENG"],["math","MATH"],["reading","READ"],["science","SCI"]].map(([key, label]) => {
-                                const s = scores[key];
-                                return s?.scaled != null ? (
-                                  <span key={key} className="admin-result-score-pill">
-                                    <span className="section-label">{label}</span>
-                                    <span className="section-value">{s.scaled}</span>
-                                  </span>
-                                ) : null;
-                              })}
-                              {scores.composite != null ? (
-                                <span className="admin-result-score-pill" style={{ background: "var(--accent)", color: "#fff" }}>
-                                  <span className="section-label" style={{ color: "rgba(255,255,255,0.7)" }}>COMP</span>
-                                  <span className="section-value" style={{ color: "#fff" }}>{scores.composite}</span>
-                                </span>
-                              ) : null}
-                            </div>
-                          ) : (
-                            <div className="admin-list-meta">No score data available</div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="empty-state">No results yet. Students will appear here after submitting tests.</div>
-                )}
-              </>
-            ) : null}
           </section>
         ) : null}
       </div>
