@@ -28,6 +28,8 @@ const ADMIN_USERS_ENDPOINT = `${BACKEND_BASE_URL}/admin/users`;
 const ADMIN_ALL_RESULTS_ENDPOINT = `${BACKEND_BASE_URL}/admin/results`;
 const ADMIN_ANALYTICS_ENDPOINT = `${BACKEND_BASE_URL}/admin/analytics`;
 const SET_USER_ROLE_ENDPOINT = (id) => `${BACKEND_BASE_URL}/admin/users/${id}/role`;
+const INVITE_CODES_ENDPOINT = `${BACKEND_BASE_URL}/admin/invite-codes`;
+const INVITE_CODE_ENDPOINT = (id) => `${BACKEND_BASE_URL}/admin/invite-codes/${id}`;
 
 const LETTER_TO_NUMERIC = { A: 1, B: 2, C: 3, D: 4, F: 1, G: 2, H: 3, J: 4 };
 
@@ -2925,6 +2927,9 @@ export default function App() {
   const [educatorResults, setEducatorResults] = useState(null);
   const [educatorAnalytics, setEducatorAnalytics] = useState(null);
   const [educatorLoading, setEducatorLoading] = useState(false);
+  const [inviteCodes, setInviteCodes] = useState([]);
+  const [newInviteCode, setNewInviteCode] = useState("");
+  const [inviteCodeError, setInviteCodeError] = useState("");
 
   // Email results
   const [emailSending, setEmailSending] = useState(false);
@@ -3139,6 +3144,58 @@ export default function App() {
     }
   }, [currentUser]);
 
+  const loadInviteCodes = useCallback(async () => {
+    try {
+      const res = await fetch(INVITE_CODES_ENDPOINT, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setInviteCodes(data.codes || []);
+      }
+    } catch { /* silent */ }
+  }, []);
+
+  const handleAddInviteCode = async () => {
+    const code = newInviteCode.trim();
+    if (!code) return;
+    setInviteCodeError("");
+    try {
+      const res = await fetch(INVITE_CODES_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setInviteCodeError(data.detail || "Failed to add invite code");
+        return;
+      }
+      setNewInviteCode("");
+      loadInviteCodes();
+    } catch {
+      setInviteCodeError("Could not reach the server.");
+    }
+  };
+
+  const handleDeleteInviteCode = async (id) => {
+    try {
+      await fetch(INVITE_CODE_ENDPOINT(id), { method: "DELETE", credentials: "include" });
+      loadInviteCodes();
+    } catch { /* silent */ }
+  };
+
+  const handleToggleInviteCode = async (id, active) => {
+    try {
+      await fetch(INVITE_CODE_ENDPOINT(id), {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ active }),
+      });
+      loadInviteCodes();
+    } catch { /* silent */ }
+  };
+
   const handleSendEmail = async () => {
     if (!currentUser || emailSending) return;
     setEmailSending(true);
@@ -3164,8 +3221,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (currentUser?.role === "educator") loadEducatorData();
-  }, [currentUser, loadEducatorData]);
+    if (currentUser?.role === "educator") {
+      loadEducatorData();
+      loadInviteCodes();
+    }
+  }, [currentUser, loadEducatorData, loadInviteCodes]);
 
   const handleSetUserRole = async (userId, role) => {
     await fetch(SET_USER_ROLE_ENDPOINT(userId), {
@@ -3574,6 +3634,7 @@ export default function App() {
       setIsLoginModalOpen(false);
       setAdminSuccess("You are signed in.");
       loadEducatorData();
+      loadInviteCodes();
     } catch (loginError) {
       setIsAdminAuthenticated(false);
       setSavedTests([]);
@@ -3990,6 +4051,7 @@ export default function App() {
               <button className={`admin-tab ${educatorTab === "tests" ? "active" : ""}`} onClick={() => setEducatorTab("tests")}>Test Setup</button>
               <button className={`admin-tab ${educatorTab === "students" ? "active" : ""}`} onClick={() => setEducatorTab("students")}>Students</button>
               <button className={`admin-tab ${educatorTab === "results" ? "active" : ""}`} onClick={() => setEducatorTab("results")}>Results</button>
+              <button className={`admin-tab ${educatorTab === "codes" ? "active" : ""}`} onClick={() => setEducatorTab("codes")}>Invite Codes</button>
             </div>
 
             {educatorLoading ? (
@@ -4220,6 +4282,67 @@ export default function App() {
                 ) : (
                   <div className="empty-state">No results yet. Students will appear here after submitting tests.</div>
                 )}
+              </>
+            ) : educatorTab === "codes" ? (
+              /* ─── Invite Codes Tab ────────────────────────── */
+              <>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-end", marginBottom: 20 }}>
+                  <div className="field" style={{ flex: 1, marginBottom: 0 }}>
+                    <label htmlFor="new-invite-code">New invite code</label>
+                    <input
+                      id="new-invite-code"
+                      className="text-input"
+                      type="text"
+                      placeholder="e.g. summer2026"
+                      value={newInviteCode}
+                      onChange={(e) => setNewInviteCode(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddInviteCode(); } }}
+                    />
+                  </div>
+                  <button type="button" className="primary-button" style={{ padding: "10px 20px", whiteSpace: "nowrap" }} onClick={handleAddInviteCode}>
+                    Add Code
+                  </button>
+                </div>
+                {inviteCodeError ? <div className="message error" style={{ marginBottom: 16 }}>{inviteCodeError}</div> : null}
+
+                {inviteCodes.length ? (
+                  <div className="admin-list">
+                    {inviteCodes.map((ic) => (
+                      <div key={ic.id} className="admin-list-item">
+                        <div className="admin-list-info">
+                          <div className="admin-list-name" style={{ fontFamily: "monospace", fontSize: "1rem" }}>{ic.code}</div>
+                          <div className="admin-list-meta">Added {new Date(ic.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <span className={`admin-list-badge ${ic.active ? "educator" : ""}`} style={ic.active ? {} : { background: "var(--danger-soft)", color: "var(--danger)" }}>
+                          {ic.active ? "Active" : "Inactive"}
+                        </span>
+                        <button
+                          type="button"
+                          className="quiet-button"
+                          style={{ fontSize: "0.82rem" }}
+                          onClick={() => handleToggleInviteCode(ic.id, !ic.active)}
+                        >
+                          {ic.active ? "Deactivate" : "Activate"}
+                        </button>
+                        <button
+                          type="button"
+                          className="quiet-button"
+                          style={{ fontSize: "0.82rem", color: "var(--danger)" }}
+                          onClick={() => handleDeleteInviteCode(ic.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-state">No invite codes yet. Add one above to restrict signups.</div>
+                )}
+
+                <p className="helper-text" style={{ marginTop: 16 }}>
+                  Students must enter a valid, active invite code to create an account.
+                  You can deactivate codes without deleting them.
+                </p>
               </>
             ) : null}
           </section>

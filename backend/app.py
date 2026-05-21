@@ -27,7 +27,7 @@ from auth_utils import (
     verify_password,
 )
 from database import Base, engine, get_db
-from models import ScanResult, User
+from models import InviteCode, ScanResult, User
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 try:
@@ -1683,7 +1683,11 @@ def submit_feedback(payload: dict = Body(...)):
 @app.post("/auth/register")
 def auth_register(body: dict = Body(...), db: Session = Depends(get_db)):
     invite_code = (body.get("invite_code") or "").strip()
-    if SIGNUP_INVITE_CODE and invite_code != SIGNUP_INVITE_CODE:
+    # Check invite code: accept env var OR any active code in the database
+    env_ok = SIGNUP_INVITE_CODE and invite_code == SIGNUP_INVITE_CODE
+    db_ok = db.query(InviteCode).filter(InviteCode.code == invite_code, InviteCode.active == True).first() is not None  # noqa: E712
+    has_any_code = SIGNUP_INVITE_CODE or db.query(InviteCode).filter(InviteCode.active == True).first() is not None  # noqa: E712
+    if has_any_code and not env_ok and not db_ok:
         raise HTTPException(status_code=403, detail="Invalid invite code. Ask your instructor for the correct code.")
 
     username = (body.get("username") or "").strip()
@@ -1930,6 +1934,59 @@ def set_user_role(
     user.role = role
     db.commit()
     return {"id": user.id, "username": user.username, "role": user.role}
+
+
+# ── Invite codes ──────────────────────────────────────────────
+
+
+@app.get("/admin/invite-codes")
+def list_invite_codes(_: User = Depends(require_educator), db: Session = Depends(get_db)):
+    codes = db.query(InviteCode).order_by(InviteCode.created_at.desc()).all()
+    return {
+        "codes": [
+            {"id": c.id, "code": c.code, "active": c.active, "createdAt": c.created_at.isoformat()}
+            for c in codes
+        ]
+    }
+
+
+@app.post("/admin/invite-codes")
+def create_invite_code(body: dict = Body(...), _: User = Depends(require_educator), db: Session = Depends(get_db)):
+    code = (body.get("code") or "").strip()
+    if not code:
+        raise HTTPException(status_code=400, detail="Invite code cannot be empty")
+    if len(code) < 3 or len(code) > 100:
+        raise HTTPException(status_code=400, detail="Invite code must be 3–100 characters")
+    if db.query(InviteCode).filter(InviteCode.code == code).first():
+        raise HTTPException(status_code=409, detail="This invite code already exists")
+    invite = InviteCode(code=code)
+    db.add(invite)
+    db.commit()
+    db.refresh(invite)
+    return {"id": invite.id, "code": invite.code, "active": invite.active, "createdAt": invite.created_at.isoformat()}
+
+
+@app.delete("/admin/invite-codes/{code_id}")
+def delete_invite_code(code_id: int, _: User = Depends(require_educator), db: Session = Depends(get_db)):
+    invite = db.get(InviteCode, code_id)
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite code not found")
+    db.delete(invite)
+    db.commit()
+    return {"ok": True}
+
+
+@app.patch("/admin/invite-codes/{code_id}")
+def toggle_invite_code(code_id: int, body: dict = Body(...), _: User = Depends(require_educator), db: Session = Depends(get_db)):
+    invite = db.get(InviteCode, code_id)
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite code not found")
+    active = body.get("active")
+    if active is None:
+        raise HTTPException(status_code=400, detail="'active' field is required")
+    invite.active = bool(active)
+    db.commit()
+    return {"id": invite.id, "code": invite.code, "active": invite.active, "createdAt": invite.created_at.isoformat()}
 
 
 @app.get("/tests")
