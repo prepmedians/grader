@@ -3880,21 +3880,6 @@ export default function App() {
             <button
               type="button"
               className="quiet-button"
-              onClick={() => {
-                if (!isAdminAuthenticated) {
-                  setAdminError("");
-                  setAdminSuccess("");
-                  setIsLoginModalOpen(true);
-                } else {
-                  setIsAdminOpen((c) => !c);
-                }
-              }}
-            >
-              {isAdminAuthenticated ? (isAdminOpen ? "Close Admin" : "Admin Panel") : "Admin"}
-            </button>
-            <button
-              type="button"
-              className="quiet-button"
               onClick={handleUserLogout}
             >
               Sign Out
