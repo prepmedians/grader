@@ -7,9 +7,12 @@ import {
 } from "./actPracticeTest1Scoring.js";
 import { generateRecommendations } from "./studyRecommendations.js";
 
-const BACKEND_BASE_URL = (
+const _rawBackendUrl = (
   import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:5000"
 ).replace(/\/$/, "");
+const BACKEND_BASE_URL = /^https?:\/\//.test(_rawBackendUrl)
+  ? _rawBackendUrl
+  : `https://${_rawBackendUrl}`;
 const TESTS_ENDPOINT = `${BACKEND_BASE_URL}/tests`;
 const ADMIN_TESTS_ENDPOINT = `${BACKEND_BASE_URL}/admin/tests`;
 const ADMIN_IMPORT_ENDPOINT = `${BACKEND_BASE_URL}/admin/tests/import-pdf`;
