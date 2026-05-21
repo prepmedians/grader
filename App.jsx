@@ -3680,7 +3680,7 @@ export default function App() {
     }
   };
   // ─── Landing page (unauthenticated) ────────────────
-  if (!currentUser && !authLoading) {
+  if (!currentUser && !authLoading && !isAdminAuthenticated) {
     return (
       <div className="landing">
         <style>{styles}</style>
@@ -3699,6 +3699,9 @@ export default function App() {
             </div>
           </div>
           <div className="landing-header-actions">
+            <button type="button" className="quiet-button" style={{ fontSize: "0.85rem" }} onClick={() => { setAdminError(""); setAdminSuccess(""); setIsLoginModalOpen(true); }}>
+              Admin
+            </button>
             <button type="button" className="landing-cta-secondary" style={{ padding: "10px 22px", fontSize: "0.9rem" }} onClick={() => openAuthModal("login")}>
               Sign In
             </button>
@@ -3784,6 +3787,32 @@ export default function App() {
                 </button>
               </form>
             </div>
+          </div>
+        ) : null}
+
+        {isLoginModalOpen && !isAdminAuthenticated ? (
+          <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="landing-admin-title">
+            <form className="login-modal" onSubmit={handleAdminLogin}>
+              <div className="modal-head">
+                <div>
+                  <h2 id="landing-admin-title" className="panel-title">Admin Login</h2>
+                  <p className="panel-subtitle">Sign in to manage tests and students.</p>
+                </div>
+                <button type="button" className="icon-button" aria-label="Close" onClick={() => setIsLoginModalOpen(false)}>x</button>
+              </div>
+              <div className="field">
+                <label htmlFor="landing-admin-user">Username</label>
+                <input id="landing-admin-user" name="username" className="text-input" type="text" value={adminCredentials.username} onChange={handleAdminCredentialChange} placeholder="Username" />
+              </div>
+              <div className="field">
+                <label htmlFor="landing-admin-pass">Password</label>
+                <input id="landing-admin-pass" name="password" className="text-input" type="password" value={adminCredentials.password} onChange={handleAdminCredentialChange} placeholder="Password" />
+              </div>
+              {adminError ? <div className="message error">{adminError}</div> : null}
+              <div className="button-row">
+                <button type="submit" className="primary-button">Sign In</button>
+              </div>
+            </form>
           </div>
         ) : null}
       </div>
