@@ -3070,6 +3070,9 @@ export default function App() {
     setMyResults(null);
     setEducatorUsers(null);
     setEducatorResults(null);
+    setIsAdminAuthenticated(false);
+    setIsAdminOpen(false);
+    setSavedTests([]);
   };
 
   // ─── Student history ───────────────────────────────────
@@ -3845,15 +3848,17 @@ export default function App() {
           </div>
 
           <div className="header-actions">
-            <div className="user-chip">
-              <div className="user-avatar" aria-hidden="true">
-                {currentUser.username.slice(0, 1).toUpperCase()}
+            {currentUser && (
+              <div className="user-chip">
+                <div className="user-avatar" aria-hidden="true">
+                  {currentUser.username.slice(0, 1).toUpperCase()}
+                </div>
+                <div>
+                  <p className="user-name">{currentUser.username}</p>
+                  <p className="user-role-badge">{currentUser.role}</p>
+                </div>
               </div>
-              <div>
-                <p className="user-name">{currentUser.username}</p>
-                <p className="user-role-badge">{currentUser.role}</p>
-              </div>
-            </div>
+            )}
             {isAdminAuthenticated && (
               <div className="user-chip" style={{ background: "var(--accent-soft)" }}>
                 <div className="user-avatar" aria-hidden="true" style={{ background: "var(--accent)", color: "#fff" }}>
