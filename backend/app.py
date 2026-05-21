@@ -70,6 +70,7 @@ DB_PATH = DATA_DIR / "tests.sqlite3"
 FEEDBACK_LOG_PATH = DATA_DIR / "answer_feedback.jsonl"
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "omr123")
+SIGNUP_INVITE_CODE = os.getenv("SIGNUP_INVITE_CODE", "")
 ANTHROPIC_MODEL = os.getenv(
     "ANSWER_KEY_EXTRACTION_MODEL", "claude-sonnet-4-20250514"
 )
@@ -1681,6 +1682,10 @@ def submit_feedback(payload: dict = Body(...)):
 
 @app.post("/auth/register")
 def auth_register(body: dict = Body(...), db: Session = Depends(get_db)):
+    invite_code = (body.get("invite_code") or "").strip()
+    if SIGNUP_INVITE_CODE and invite_code != SIGNUP_INVITE_CODE:
+        raise HTTPException(status_code=403, detail="Invalid invite code. Ask your instructor for the correct code.")
+
     username = (body.get("username") or "").strip()
     email = (body.get("email") or "").strip().lower()
     password = body.get("password") or ""

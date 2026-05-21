@@ -2910,7 +2910,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState("login"); // "login" | "register"
-  const [authForm, setAuthForm] = useState({ username: "", email: "", password: "" });
+  const [authForm, setAuthForm] = useState({ username: "", email: "", password: "", inviteCode: "" });
   const [authError, setAuthError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
   const [authSubmitting, setAuthSubmitting] = useState(false);
@@ -3014,7 +3014,7 @@ export default function App() {
 
   const openAuthModal = (tab = "login") => {
     setAuthTab(tab);
-    setAuthForm({ username: "", email: "", password: "" });
+    setAuthForm({ username: "", email: "", password: "", inviteCode: "" });
     setAuthError("");
     setAuthSuccess("");
     setIsAuthModalOpen(true);
@@ -3032,7 +3032,7 @@ export default function App() {
     const isRegister = authTab === "register";
     const url = isRegister ? AUTH_REGISTER_ENDPOINT : AUTH_LOGIN_ENDPOINT;
     const body = isRegister
-      ? { username: authForm.username, email: authForm.email, password: authForm.password }
+      ? { username: authForm.username, email: authForm.email, password: authForm.password, invite_code: authForm.inviteCode }
       : { username: authForm.username, password: authForm.password };
     try {
       const response = await fetch(url, {
@@ -3049,7 +3049,7 @@ export default function App() {
       if (isRegister) {
         // Don't auto-login — switch to login tab with success message
         setAuthTab("login");
-        setAuthForm({ username: authForm.username, email: "", password: "" });
+        setAuthForm({ username: authForm.username, email: "", password: "", inviteCode: "" });
         setAuthSuccess("Account created! Please sign in with your credentials.");
         // Log out the cookie that the backend set during registration
         fetch(AUTH_LOGOUT_ENDPOINT, { method: "POST", credentials: "include" }).catch(() => {});
@@ -3770,6 +3770,13 @@ export default function App() {
               </div>
               {authSuccess ? <div className="message success">{authSuccess}</div> : null}
               <form className="auth-form" onSubmit={handleAuthSubmit}>
+                {authTab === "register" && (
+                  <div className="field">
+                    <label htmlFor="auth-invite-code">Invite Code</label>
+                    <input id="auth-invite-code" className="text-input" type="text" placeholder="Enter your invite code" value={authForm.inviteCode} onChange={(e) => handleAuthFormChange("inviteCode", e.target.value)} required />
+                    <span className="helper-text" style={{ fontSize: "0.78rem", marginTop: 4 }}>Ask your instructor for the invite code</span>
+                  </div>
+                )}
                 <div className="field">
                   <label htmlFor="auth-username">Username</label>
                   <input id="auth-username" className="text-input" type="text" autoComplete="username" value={authForm.username} onChange={(e) => handleAuthFormChange("username", e.target.value)} required />
