@@ -2875,6 +2875,7 @@ export default function App() {
   const [uploadSuccess, setUploadSuccess] = useState("");
 
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [showUploadInAdmin, setShowUploadInAdmin] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [adminCredentials, setAdminCredentials] = useState({
@@ -4351,8 +4352,29 @@ export default function App() {
           </section>
         ) : null}
 
+        {isAdminAuthenticated && isAdminOpen && !showUploadInAdmin ? (
+          <button
+            type="button"
+            className="panel-card"
+            style={{ width: "100%", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", border: "1px solid var(--line)", background: "var(--surface)" }}
+            onClick={() => setShowUploadInAdmin(true)}
+          >
+            <span style={{ fontWeight: 700, color: "var(--text)" }}>Score a Test</span>
+            <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Click to open the upload form</span>
+          </button>
+        ) : (
         <section ref={uploadRef} className="hero-card">
           <div className="hero-top">
+            {isAdminAuthenticated && isAdminOpen && (
+              <button
+                type="button"
+                className="quiet-button"
+                style={{ alignSelf: "flex-end", marginBottom: 8, fontSize: "0.82rem" }}
+                onClick={() => setShowUploadInAdmin(false)}
+              >
+                Collapse
+              </button>
+            )}
             <span className="eyebrow">Prepmedians ACT Results</span>
             <h1 className="hero-title">Upload your answer sheet and get your Prepmedians score report.</h1>
             <p className="hero-copy">
@@ -4641,6 +4663,7 @@ export default function App() {
             </div>
           </div>
         </section>
+        )}
 
         {results ? (
           <>
