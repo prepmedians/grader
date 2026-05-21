@@ -2159,6 +2159,381 @@ const styles = `
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  /* ─── Unified Admin Panel ───────────────────────────── */
+
+  .admin-panel {
+    animation: rise 0.5s ease both;
+  }
+
+  .admin-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .admin-panel-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .admin-panel-subtitle {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+
+  .admin-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+
+  .admin-tab {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .admin-tab:hover {
+    color: var(--text);
+  }
+
+  .admin-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .admin-kpi-card {
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+
+  .admin-kpi-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .admin-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .admin-score-card {
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .admin-score-section {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .admin-score-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .admin-week-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+
+  .admin-week-row:last-child {
+    border-bottom: none;
+  }
+
+  .admin-week-bar {
+    height: 6px;
+    background: var(--accent);
+    border-radius: 3px;
+    flex: 1;
+    max-width: 180px;
+    margin: 0 12px;
+  }
+
+  .admin-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .admin-list-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    transition: box-shadow 0.2s;
+  }
+
+  .admin-list-item:hover {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .admin-list-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+  }
+
+  .admin-list-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-list-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text);
+  }
+
+  .admin-list-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .admin-list-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+
+  .admin-list-badge.student {
+    background: var(--info-soft);
+    color: var(--info);
+  }
+
+  .admin-list-badge.educator {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .admin-list-stat {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .admin-list-stat-value {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .admin-list-stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .admin-result-card {
+    padding: 16px 18px;
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .admin-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .admin-result-student {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  .admin-result-date {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .admin-result-test {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .admin-result-scores {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .admin-result-score-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    background: var(--accent-soft);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .admin-result-score-pill .section-label {
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+  }
+
+  .admin-result-score-pill .section-value {
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .admin-result-source {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--surface-soft);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  .admin-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .admin-test-library-item {
+    padding: 16px;
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .admin-test-library-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .admin-test-library-meta {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .admin-test-library-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .admin-test-library-pill {
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .admin-section-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px;
+  }
+
+  @media (max-width: 980px) {
+    .admin-setup-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .admin-kpi-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-result-scores {
+      flex-direction: column;
+    }
+  }
 `;
 
 function mapAnswer(value, questionNumber) {
@@ -2545,7 +2920,7 @@ export default function App() {
   const [myResultsLoading, setMyResultsLoading] = useState(false);
 
   // Educator view
-  const [educatorTab, setEducatorTab] = useState("users"); // "users" | "results" | "analytics"
+  const [educatorTab, setEducatorTab] = useState("overview"); // "overview" | "tests" | "students" | "results"
   const [educatorUsers, setEducatorUsers] = useState(null);
   const [educatorResults, setEducatorResults] = useState(null);
   const [educatorAnalytics, setEducatorAnalytics] = useState(null);
@@ -4322,158 +4697,7 @@ export default function App() {
           </section>
         ) : null}
 
-        {currentUser?.role === "educator" ? (
-          <section className="panel-card stack">
-            <div className="panel-head">
-              <div>
-                <h2 className="panel-title">Educator Dashboard</h2>
-                <p className="panel-subtitle">Students and their results</p>
-              </div>
-              <button type="button" className="quiet-button" onClick={loadEducatorData}>Refresh</button>
-            </div>
-            <div className="educator-tabs">
-              <button className={`educator-tab ${educatorTab === "users" ? "active" : ""}`} onClick={() => setEducatorTab("users")}>Students</button>
-              <button className={`educator-tab ${educatorTab === "results" ? "active" : ""}`} onClick={() => setEducatorTab("results")}>All Results</button>
-              <button className={`educator-tab ${educatorTab === "analytics" ? "active" : ""}`} onClick={() => setEducatorTab("analytics")}>Analytics</button>
-            </div>
-            {educatorLoading ? (
-              <p className="helper-text">Loading…</p>
-            ) : educatorTab === "users" ? (
-              <div style={{ overflowX: "auto" }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Username</th>
-                      <th>Email</th>
-                      <th>Scans</th>
-                      <th>Last scan</th>
-                      <th>Role</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(educatorUsers || []).map((u) => (
-                      <tr key={u.id}>
-                        <td>{u.username}</td>
-                        <td>{u.email}</td>
-                        <td>{u.scanCount}</td>
-                        <td>{u.lastScan ? new Date(u.lastScan).toLocaleDateString() : "—"}</td>
-                        <td>
-                          <select
-                            className="role-select"
-                            value={u.role}
-                            onChange={(e) => handleSetUserRole(u.id, e.target.value)}
-                          >
-                            <option value="student">student</option>
-                            <option value="educator">educator</option>
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : educatorTab === "results" ? (
-              <div style={{ overflowX: "auto" }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Test</th>
-                      <th>Source</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(educatorResults || []).map((r) => (
-                      <tr key={r.id}>
-                        <td>{r.username}</td>
-                        <td>{r.testName || "—"}</td>
-                        <td>{r.source}</td>
-                        <td>{new Date(r.createdAt).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : educatorTab === "analytics" ? (
-              educatorAnalytics ? (
-                <>
-                  <div className="analytics-grid">
-                    <div className="analytics-card">
-                      <div className="analytics-value">{educatorAnalytics.totalStudents ?? "—"}</div>
-                      <div className="analytics-label">Students</div>
-                    </div>
-                    <div className="analytics-card">
-                      <div className="analytics-value">{educatorAnalytics.totalScans ?? "—"}</div>
-                      <div className="analytics-label">Total Scans</div>
-                    </div>
-                  </div>
-
-                  {educatorAnalytics.avgScores && Object.values(educatorAnalytics.avgScores).some(Boolean) ? (
-                    <div className="panel-card" style={{ marginBottom: 16 }}>
-                      <h3 style={{ margin: "0 0 12px", fontSize: "0.9rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Average ACT Scaled Scores</h3>
-                      {[["english","English"],["math","Math"],["reading","Reading"],["science","Science"]].map(([key, label]) => {
-                        const avg = educatorAnalytics.avgScores[key];
-                        return (
-                          <div key={key} className="section-score-row">
-                            <span>{label}</span>
-                            <strong>{avg != null ? avg : "No data yet"}</strong>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="helper-text">No scored results yet. Scores appear once students submit tests with an answer key.</p>
-                  )}
-
-                  {educatorAnalytics.scansPerWeek?.length > 0 ? (
-                    <div className="panel-card">
-                      <h3 style={{ margin: "0 0 12px", fontSize: "0.9rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Scans per Week</h3>
-                      {educatorAnalytics.scansPerWeek.map((w) => (
-                        <div key={w.week} className="section-score-row">
-                          <span>{w.week}</span>
-                          <strong>{w.count}</strong>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <p className="helper-text">No analytics data yet.</p>
-              )
-            ) : null}
-          </section>
-        ) : null}
-
-        {apiPreview && isAdminOpen && isAdminAuthenticated ? (
-          <section className="preview-card">
-            <div className="panel-head">
-              <div>
-                <h2 className="panel-title">Admin Review</h2>
-                <p className="panel-subtitle">
-                  {apiPreview.endpointLabel}
-                </p>
-              </div>
-              <span className="status-chip">{apiPreview.contentType}</span>
-            </div>
-
-            {apiPreview.type === "image" ? (
-              <img
-                className="preview-image"
-                src={apiPreview.data}
-                alt={`${apiPreview.endpointLabel} response`}
-              />
-            ) : (
-              <pre className="preview-code">
-                {apiPreview.type === "json"
-                  ? JSON.stringify(apiPreview.data, null, 2)
-                  : apiPreview.data}
-              </pre>
-            )}
-          </section>
-        ) : null}
-
-        {!results && (!apiPreview || !isAdminOpen || !isAdminAuthenticated) ? (
+        {!results ? (
           <section className="panel-card">
             <div className="empty-state">
               Upload your answer sheet to get your score report and study plan.
@@ -4481,193 +4705,257 @@ export default function App() {
           </section>
         ) : null}
 
-        {isAdminOpen && isAdminAuthenticated ? (
-          <section className="admin-grid">
-            <div className="panel-card stack">
-              <div className="panel-head">
-                <div>
-                  <h2 className="panel-title">Test Setup</h2>
-                  <p className="panel-subtitle">
-                    Add a new ACT test by uploading its scoring guide and the
-                    four subject study-material PDFs.
-                  </p>
-                </div>
-                <span className="status-chip">
-                  Ready
-                </span>
+        {currentUser?.role === "educator" ? (
+          <section className="panel-card admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <h2 className="admin-panel-title">Admin Panel</h2>
+                <p className="admin-panel-subtitle">Manage tests, students, and results</p>
               </div>
+              <button type="button" className="quiet-button" onClick={loadEducatorData}>Refresh</button>
+            </div>
 
-              <form className="stack" onSubmit={handleSaveTest}>
-                  <div className="field">
-                    <label htmlFor="test-name">Test name</label>
-                    <input
-                      id="test-name"
-                      className="text-input"
-                      type="text"
-                      value={testName}
-                      onChange={(event) => setTestName(event.target.value)}
-                      placeholder="ACT Practice Test 01"
-                    />
+            <div className="admin-tabs">
+              <button className={`admin-tab ${educatorTab === "overview" ? "active" : ""}`} onClick={() => setEducatorTab("overview")}>Overview</button>
+              <button className={`admin-tab ${educatorTab === "tests" ? "active" : ""}`} onClick={() => setEducatorTab("tests")}>Test Setup</button>
+              <button className={`admin-tab ${educatorTab === "students" ? "active" : ""}`} onClick={() => setEducatorTab("students")}>Students</button>
+              <button className={`admin-tab ${educatorTab === "results" ? "active" : ""}`} onClick={() => setEducatorTab("results")}>Results</button>
+            </div>
+
+            {educatorLoading ? (
+              <p className="helper-text">Loading data...</p>
+
+            ) : educatorTab === "overview" ? (
+              /* ─── Overview Tab ────────────────────────────── */
+              <>
+                <div className="admin-kpi-grid">
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{educatorAnalytics?.totalStudents ?? "—"}</div>
+                    <div className="admin-kpi-label">Students</div>
                   </div>
-
-                  <div className="field">
-                    <label htmlFor="scoring-rubric-upload">Scoring guide PDF</label>
-                    <input
-                      key={`scoring-rubric-${adminUploadResetKey}`}
-                      id="scoring-rubric-upload"
-                      className="file-input"
-                      type="file"
-                      accept=".pdf,application/pdf"
-                      onChange={(event) =>
-                        setScoringRubricFile(event.target.files?.[0] || null)
-                      }
-                    />
-                    <div className="file-name">
-                      {scoringRubricFile
-                        ? scoringRubricFile.name
-                        : "No scoring guide selected yet"}
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{educatorAnalytics?.totalScans ?? "—"}</div>
+                    <div className="admin-kpi-label">Total Scans</div>
+                  </div>
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">{savedTests.length || availableTests.length}</div>
+                    <div className="admin-kpi-label">Tests</div>
+                  </div>
+                  <div className="admin-kpi-card">
+                    <div className="admin-kpi-value">
+                      {educatorAnalytics?.avgScores
+                        ? (() => {
+                            const vals = Object.values(educatorAnalytics.avgScores).filter(Boolean);
+                            return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : "—";
+                          })()
+                        : "—"}
                     </div>
+                    <div className="admin-kpi-label">Avg Score</div>
                   </div>
+                </div>
 
-                  <div className="field">
-                    <label>Study-material PDFs</label>
-                    <div className="stack">
-                      {SECTION_CONFIG.map(({ key, title }) => (
-                        <div key={`recommendation-${key}`} className="field">
-                          <label htmlFor={`${key}-recommendation-upload`}>
-                            {title} study materials
-                          </label>
-                          <input
-                            key={`${key}-recommendation-${adminUploadResetKey}`}
-                            id={`${key}-recommendation-upload`}
-                            className="file-input"
-                            type="file"
-                            accept=".pdf,application/pdf"
-                            onChange={(event) =>
-                              handleRecommendationFileChange(
-                                key,
-                                event.target.files?.[0] || null
-                              )
-                            }
-                          />
-                          <div className="file-name">
-                            {recommendationFiles[key]
-                              ? recommendationFiles[key].name
-                              : `No ${title.toLowerCase()} study-material PDF selected yet`}
-                          </div>
+                {educatorAnalytics?.avgScores && Object.values(educatorAnalytics.avgScores).some(Boolean) ? (
+                  <>
+                    <p className="admin-section-title">Average Scaled Scores</p>
+                    <div className="admin-scores-grid">
+                      {[["english","English"],["math","Math"],["reading","Reading"],["science","Science"]].map(([key, label]) => (
+                        <div key={key} className="admin-score-card">
+                          <div className="admin-score-section">{label}</div>
+                          <div className="admin-score-value">{educatorAnalytics.avgScores[key] ?? "—"}</div>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </>
+                ) : (
+                  <p className="helper-text">No scored results yet. Scores appear once students submit tests.</p>
+                )}
 
-                  {adminError ? (
-                    <div className="message error">{adminError}</div>
-                  ) : null}
-                  {adminSuccess ? (
-                    <div className="message success">{adminSuccess}</div>
-                  ) : null}
-
-                  <div className="button-row">
-                    <button
-                      type="submit"
-                      className="primary-button"
-                      disabled={isSavingTest}
-                    >
-                      {isSavingTest ? "Saving Test..." : "Save Test"}
-                    </button>
-                  </div>
-
-                  <p className="helper-text">
-                    Upload one scoring guide plus four subject study-material
-                    PDFs. The app will prepare a shared test that students can
-                    choose from.
-                  </p>
-              </form>
-            </div>
-
-            <div className="panel-card stack">
-              <div className="panel-head">
-                <div>
-                  <h2 className="panel-title">Test Library</h2>
-                  <p className="panel-subtitle">
-                    These tests are available to students from the test selector.
-                  </p>
-                </div>
-                <span className="status-chip">
-                  {savedTests.length} total
-                </span>
-              </div>
-
-              {savedTests.length ? (
-                <div className="saved-tests">
-                  {savedTests.map((test) => (
-                    <article key={test.id} className="saved-test-card">
-                      <div>
-                        <h3 className="saved-test-title">{test.name}</h3>
-                        <div className="saved-test-date">
-                          {formatSavedDate(test.createdAt)}
+                {educatorAnalytics?.scansPerWeek?.length > 0 ? (
+                  <>
+                    <p className="admin-section-title">Scans per Week</p>
+                    {(() => {
+                      const maxCount = Math.max(...educatorAnalytics.scansPerWeek.map((w) => w.count), 1);
+                      return educatorAnalytics.scansPerWeek.map((w) => (
+                        <div key={w.week} className="admin-week-row">
+                          <span style={{ minWidth: 90, color: "var(--muted)", fontSize: "0.82rem" }}>{w.week}</span>
+                          <div className="admin-week-bar" style={{ width: `${(w.count / maxCount) * 100}%` }} />
+                          <strong style={{ minWidth: 30, textAlign: "right" }}>{w.count}</strong>
                         </div>
-                      </div>
+                      ));
+                    })()}
+                  </>
+                ) : null}
+              </>
 
-                      <div className="helper-text">
-                        Scoring guide: {test.sourceFilename || "Manual setup"}
-                        {test.extractionSummary ? ` | ${test.extractionSummary}` : ""}
-                      </div>
-
-                      {Object.keys(test.recommendationFilenames || {}).length ? (
-                        <div className="helper-text">
-                          Study-material PDFs:{" "}
-                          {Object.entries(test.recommendationFilenames)
-                            .map(([sectionKey, filename]) => `${sectionKey}: ${filename}`)
-                            .join(" | ")}
+            ) : educatorTab === "tests" ? (
+              /* ─── Test Setup Tab ──────────────────────────── */
+              <>
+                {!isAdminAuthenticated ? (
+                  <form className="stack" onSubmit={handleAdminLogin} style={{ maxWidth: 400 }}>
+                    <p className="helper-text">Sign in with admin credentials to manage tests.</p>
+                    <div className="field">
+                      <label htmlFor="admin-username">Username</label>
+                      <input id="admin-username" name="username" className="text-input" type="text" value={adminCredentials.username} onChange={handleAdminCredentialChange} placeholder="Username" />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="admin-password">Password</label>
+                      <input id="admin-password" name="password" className="text-input" type="password" value={adminCredentials.password} onChange={handleAdminCredentialChange} placeholder="Password" />
+                    </div>
+                    {adminError ? <div className="message error">{adminError}</div> : null}
+                    <div className="button-row">
+                      <button type="submit" className="primary-button">Sign In</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="admin-setup-grid">
+                    <div className="stack">
+                      <p className="admin-section-title">Add New Test</p>
+                      <form className="stack" onSubmit={handleSaveTest}>
+                        <div className="field">
+                          <label htmlFor="test-name">Test name</label>
+                          <input id="test-name" className="text-input" type="text" value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="ACT Practice Test 01" />
                         </div>
-                      ) : null}
+                        <div className="field">
+                          <label htmlFor="scoring-rubric-upload">Scoring guide PDF</label>
+                          <input key={`scoring-rubric-${adminUploadResetKey}`} id="scoring-rubric-upload" className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => setScoringRubricFile(e.target.files?.[0] || null)} />
+                          <div className="file-name">{scoringRubricFile ? scoringRubricFile.name : "No scoring guide selected"}</div>
+                        </div>
+                        <div className="field">
+                          <label>Study-material PDFs</label>
+                          <div className="stack">
+                            {SECTION_CONFIG.map(({ key, title }) => (
+                              <div key={`rec-${key}`} className="field">
+                                <label htmlFor={`${key}-rec-upload`}>{title}</label>
+                                <input key={`${key}-rec-${adminUploadResetKey}`} id={`${key}-rec-upload`} className="file-input" type="file" accept=".pdf,application/pdf" onChange={(e) => handleRecommendationFileChange(key, e.target.files?.[0] || null)} />
+                                <div className="file-name">{recommendationFiles[key] ? recommendationFiles[key].name : `No ${title.toLowerCase()} PDF`}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        {adminError ? <div className="message error">{adminError}</div> : null}
+                        {adminSuccess ? <div className="message success">{adminSuccess}</div> : null}
+                        <div className="button-row">
+                          <button type="submit" className="primary-button" disabled={isSavingTest}>{isSavingTest ? "Saving..." : "Save Test"}</button>
+                        </div>
+                      </form>
+                    </div>
 
-                      <div className="saved-test-sections">
-                        {SECTION_CONFIG.map(({ key, title }) => {
-                          const counts = test.sectionCounts?.[key];
-
-                          return (
-                            <div key={`${test.id}-${key}`} className="saved-section-pill">
-                              {title}: {counts?.total || 0} total / {counts?.blank || 0} blank
+                    <div className="stack">
+                      <p className="admin-section-title">Test Library ({savedTests.length || availableTests.length} tests)</p>
+                      {(savedTests.length ? savedTests : availableTests).length ? (
+                        <div className="admin-list">
+                          {(savedTests.length ? savedTests : availableTests).map((test) => (
+                            <div key={test.id} className="admin-test-library-item">
+                              <h3 className="admin-test-library-name">{test.name}</h3>
+                              <div className="admin-test-library-meta">
+                                {formatSavedDate(test.createdAt)}
+                                {test.sourceFilename ? ` \u00b7 ${test.sourceFilename}` : ""}
+                              </div>
+                              <div className="admin-test-library-pills">
+                                {SECTION_CONFIG.map(({ key, title }) => {
+                                  const counts = test.sectionCounts?.[key];
+                                  return (
+                                    <span key={`${test.id}-${key}`} className="admin-test-library-pill">
+                                      {title}: {counts?.total || 0}
+                                    </span>
+                                  );
+                                })}
+                              </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ) : availableTests.length ? (
-                <div className="saved-tests">
-                  {availableTests.map((test) => (
-                    <article key={test.id} className="saved-test-card">
-                      <div>
-                        <h3 className="saved-test-title">{test.name}</h3>
-                        <div className="saved-test-date">
-                          {formatSavedDate(test.createdAt)}
+                          ))}
                         </div>
+                      ) : (
+                        <div className="empty-state">No tests yet. Upload a scoring guide to create one.</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+
+            ) : educatorTab === "students" ? (
+              /* ─── Students Tab ────────────────────────────── */
+              <>
+                {(educatorUsers || []).length ? (
+                  <div className="admin-list">
+                    {educatorUsers.map((u) => (
+                      <div key={u.id} className="admin-list-item">
+                        <div className="admin-list-avatar">
+                          {u.username.slice(0, 1).toUpperCase()}
+                        </div>
+                        <div className="admin-list-info">
+                          <div className="admin-list-name">{u.username}</div>
+                          <div className="admin-list-meta">
+                            {u.email}
+                            {u.lastScan ? ` \u00b7 Last scan: ${new Date(u.lastScan).toLocaleDateString()}` : ""}
+                          </div>
+                        </div>
+                        <div className="admin-list-stat">
+                          <div className="admin-list-stat-value">{u.scanCount}</div>
+                          <div className="admin-list-stat-label">scans</div>
+                        </div>
+                        <select className="role-select" value={u.role} onChange={(e) => handleSetUserRole(u.id, e.target.value)}>
+                          <option value="student">student</option>
+                          <option value="educator">educator</option>
+                        </select>
+                        <span className={`admin-list-badge ${u.role}`}>{u.role}</span>
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-state">No students have signed up yet.</div>
+                )}
+              </>
 
-                      <div className="saved-test-sections">
-                        {SECTION_CONFIG.map(({ key, title }) => {
-                          const counts = test.sectionCounts?.[key];
-
-                          return (
-                            <div key={`${test.id}-${key}`} className="saved-section-pill">
-                              {title}: {counts?.total || 0} answers
+            ) : educatorTab === "results" ? (
+              /* ─── Results Tab ─────────────────────────────── */
+              <>
+                {(educatorResults || []).length ? (
+                  <div className="admin-list">
+                    {educatorResults.map((r) => {
+                      let scores = null;
+                      try { scores = r.scoresJson ? JSON.parse(r.scoresJson) : null; } catch { /* ignore */ }
+                      return (
+                        <div key={r.id} className="admin-result-card">
+                          <div className="admin-result-header">
+                            <div>
+                              <div className="admin-result-student">{r.username}</div>
+                              <div className="admin-result-test">{r.testName || "Unknown test"}</div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-state">
-                  No shared tests yet. Upload the first scoring guide to get started.
-                </div>
-              )}
-            </div>
+                            <div style={{ textAlign: "right" }}>
+                              <div className="admin-result-date">{new Date(r.createdAt).toLocaleDateString()}</div>
+                              <span className="admin-result-source">{r.source}</span>
+                            </div>
+                          </div>
+                          {scores ? (
+                            <div className="admin-result-scores">
+                              {[["english","ENG"],["math","MATH"],["reading","READ"],["science","SCI"]].map(([key, label]) => {
+                                const s = scores[key];
+                                return s?.scaled != null ? (
+                                  <span key={key} className="admin-result-score-pill">
+                                    <span className="section-label">{label}</span>
+                                    <span className="section-value">{s.scaled}</span>
+                                  </span>
+                                ) : null;
+                              })}
+                              {scores.composite != null ? (
+                                <span className="admin-result-score-pill" style={{ background: "var(--accent)", color: "#fff" }}>
+                                  <span className="section-label" style={{ color: "rgba(255,255,255,0.7)" }}>COMP</span>
+                                  <span className="section-value" style={{ color: "#fff" }}>{scores.composite}</span>
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <div className="admin-list-meta">No score data available</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="empty-state">No results yet. Students will appear here after submitting tests.</div>
+                )}
+              </>
+            ) : null}
           </section>
         ) : null}
       </div>
