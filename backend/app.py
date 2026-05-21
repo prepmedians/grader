@@ -91,6 +91,7 @@ def build_allowed_origins():
         return [origin.strip() for origin in configured.split(",") if origin.strip()]
 
     return [
+        "https://grader.prepmedians.com",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:4173",
