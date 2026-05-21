@@ -3570,6 +3570,7 @@ export default function App() {
       setIsAdminOpen(true);
       setIsLoginModalOpen(false);
       setAdminSuccess("You are signed in.");
+      loadEducatorData();
     } catch (loginError) {
       setIsAdminAuthenticated(false);
       setSavedTests([]);
@@ -3835,23 +3836,21 @@ export default function App() {
                 </div>
               </div>
             )}
-            {currentUser.role === "educator" && (
-              <button
-                type="button"
-                className="quiet-button"
-                onClick={() => {
-                  if (!isAdminAuthenticated) {
-                    setAdminError("");
-                    setAdminSuccess("");
-                    setIsLoginModalOpen(true);
-                  } else {
-                    setIsAdminOpen((c) => !c);
-                  }
-                }}
-              >
-                {isAdminAuthenticated ? (isAdminOpen ? "Close Setup" : "Test Setup") : "Admin Login"}
-              </button>
-            )}
+            <button
+              type="button"
+              className="quiet-button"
+              onClick={() => {
+                if (!isAdminAuthenticated) {
+                  setAdminError("");
+                  setAdminSuccess("");
+                  setIsLoginModalOpen(true);
+                } else {
+                  setIsAdminOpen((c) => !c);
+                }
+              }}
+            >
+              {isAdminAuthenticated ? (isAdminOpen ? "Close Admin" : "Admin Panel") : "Admin"}
+            </button>
             <button
               type="button"
               className="quiet-button"
@@ -4705,7 +4704,7 @@ export default function App() {
           </section>
         ) : null}
 
-        {currentUser?.role === "educator" ? (
+        {isAdminAuthenticated && isAdminOpen ? (
           <section className="panel-card admin-panel">
             <div className="admin-panel-header">
               <div>

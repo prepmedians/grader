@@ -1703,7 +1703,7 @@ def auth_register(body: dict = Body(...), db: Session = Depends(get_db)):
 
     token = create_jwt(user.id, user.username, user.role)
     response = FResponse(content=json.dumps({"id": user.id, "username": user.username, "email": user.email, "role": user.role}), media_type="application/json", status_code=201)
-    response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="lax", max_age=60 * 60 * 24 * 30, secure=True)
+    response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none", max_age=60 * 60 * 24 * 30, secure=True)
     return response
 
 
@@ -1718,7 +1718,7 @@ def auth_login(body: dict = Body(...), db: Session = Depends(get_db)):
 
     token = create_jwt(user.id, user.username, user.role)
     response = FResponse(content=json.dumps({"id": user.id, "username": user.username, "email": user.email, "role": user.role}), media_type="application/json")
-    response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="lax", max_age=60 * 60 * 24 * 30, secure=True)
+    response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none", max_age=60 * 60 * 24 * 30, secure=True)
     return response
 
 
