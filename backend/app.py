@@ -1940,7 +1940,7 @@ def set_user_role(
 
 
 @app.get("/admin/invite-codes")
-def list_invite_codes(_: User = Depends(require_educator), db: Session = Depends(get_db)):
+def list_invite_codes(_: str = Depends(require_admin), db: Session = Depends(get_db)):
     codes = db.query(InviteCode).order_by(InviteCode.created_at.desc()).all()
     return {
         "codes": [
@@ -1951,7 +1951,7 @@ def list_invite_codes(_: User = Depends(require_educator), db: Session = Depends
 
 
 @app.post("/admin/invite-codes")
-def create_invite_code(body: dict = Body(...), _: User = Depends(require_educator), db: Session = Depends(get_db)):
+def create_invite_code(body: dict = Body(...), _: str = Depends(require_admin), db: Session = Depends(get_db)):
     code = (body.get("code") or "").strip()
     if not code:
         raise HTTPException(status_code=400, detail="Invite code cannot be empty")
@@ -1967,7 +1967,7 @@ def create_invite_code(body: dict = Body(...), _: User = Depends(require_educato
 
 
 @app.delete("/admin/invite-codes/{code_id}")
-def delete_invite_code(code_id: int, _: User = Depends(require_educator), db: Session = Depends(get_db)):
+def delete_invite_code(code_id: int, _: str = Depends(require_admin), db: Session = Depends(get_db)):
     invite = db.get(InviteCode, code_id)
     if not invite:
         raise HTTPException(status_code=404, detail="Invite code not found")
@@ -1977,7 +1977,7 @@ def delete_invite_code(code_id: int, _: User = Depends(require_educator), db: Se
 
 
 @app.patch("/admin/invite-codes/{code_id}")
-def toggle_invite_code(code_id: int, body: dict = Body(...), _: User = Depends(require_educator), db: Session = Depends(get_db)):
+def toggle_invite_code(code_id: int, body: dict = Body(...), _: str = Depends(require_admin), db: Session = Depends(get_db)):
     invite = db.get(InviteCode, code_id)
     if not invite:
         raise HTTPException(status_code=404, detail="Invite code not found")

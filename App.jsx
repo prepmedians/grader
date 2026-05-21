@@ -3144,15 +3144,20 @@ export default function App() {
     }
   }, [currentUser]);
 
+  const adminAuthHeaders = useMemo(() => {
+    if (!adminCredentials.username.trim()) return {};
+    return { Authorization: buildBasicAuthHeader(adminCredentials.username.trim(), adminCredentials.password.trim()) };
+  }, [adminCredentials]);
+
   const loadInviteCodes = useCallback(async () => {
     try {
-      const res = await fetch(INVITE_CODES_ENDPOINT, { credentials: "include" });
+      const res = await fetch(INVITE_CODES_ENDPOINT, { headers: adminAuthHeaders });
       if (res.ok) {
         const data = await res.json();
         setInviteCodes(data.codes || []);
       }
     } catch { /* silent */ }
-  }, []);
+  }, [adminAuthHeaders]);
 
   const handleAddInviteCode = async () => {
     const code = newInviteCode.trim();
@@ -3161,8 +3166,7 @@ export default function App() {
     try {
       const res = await fetch(INVITE_CODES_ENDPOINT, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...adminAuthHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
       });
       const data = await res.json().catch(() => ({}));
@@ -3179,7 +3183,7 @@ export default function App() {
 
   const handleDeleteInviteCode = async (id) => {
     try {
-      await fetch(INVITE_CODE_ENDPOINT(id), { method: "DELETE", credentials: "include" });
+      await fetch(INVITE_CODE_ENDPOINT(id), { method: "DELETE", headers: adminAuthHeaders });
       loadInviteCodes();
     } catch { /* silent */ }
   };
@@ -3188,8 +3192,7 @@ export default function App() {
     try {
       await fetch(INVITE_CODE_ENDPOINT(id), {
         method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...adminAuthHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ active }),
       });
       loadInviteCodes();
