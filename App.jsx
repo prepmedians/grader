@@ -1857,6 +1857,308 @@ const styles = `
       padding: 20px;
     }
   }
+
+  /* ─── Landing Page ──────────────────────────────────── */
+
+  .landing {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .landing-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(13,124,102,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(13,124,102,0.08) 0%, transparent 55%),
+      var(--bg);
+    pointer-events: none;
+  }
+
+  .landing-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0;
+    animation: orbFloat 12s ease-in-out infinite, fadeIn 1.5s ease forwards;
+  }
+
+  .landing-bg-orb:nth-child(1) {
+    width: 420px; height: 420px;
+    top: -80px; left: -100px;
+    background: rgba(13,124,102,0.15);
+    animation-delay: 0s;
+  }
+
+  .landing-bg-orb:nth-child(2) {
+    width: 340px; height: 340px;
+    bottom: -60px; right: -80px;
+    background: rgba(13,124,102,0.10);
+    animation-delay: 4s;
+  }
+
+  .landing-bg-orb:nth-child(3) {
+    width: 200px; height: 200px;
+    top: 40%; left: 55%;
+    background: rgba(37,99,235,0.08);
+    animation-delay: 8s;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -15px) scale(1.05); }
+    66% { transform: translate(-10px, 10px) scale(0.97); }
+  }
+
+  .landing-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 40px;
+    animation: landSlideDown 0.7s ease both;
+  }
+
+  @keyframes landSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .landing-header .brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .landing-header .brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  .landing-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .landing-hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px 60px;
+    gap: 32px;
+  }
+
+  .landing-hero-content {
+    max-width: 680px;
+    animation: landRise 0.9s ease both;
+    animation-delay: 0.15s;
+  }
+
+  @keyframes landRise {
+    from { opacity: 0; transform: translateY(36px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .landing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  .landing-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+
+  .landing-title {
+    font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    margin: 0 0 20px;
+  }
+
+  .landing-title-accent {
+    background: linear-gradient(135deg, var(--accent), #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .landing-subtitle {
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0 auto 36px;
+    max-width: 540px;
+  }
+
+  .landing-cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .landing-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(13,124,102,0.3);
+  }
+
+  .landing-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(13,124,102,0.4);
+  }
+
+  .landing-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--surface-strong);
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .landing-cta-secondary:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .landing-features {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 840px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+    animation: landRise 0.9s ease both;
+    animation-delay: 0.4s;
+  }
+
+  .landing-feature-card {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .landing-feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .landing-feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+  }
+
+  .landing-feature-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 6px;
+  }
+
+  .landing-feature-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .landing-footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px 24px 28px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    animation: landRise 0.9s ease both;
+    animation-delay: 0.6s;
+  }
+
+  @media (max-width: 640px) {
+    .landing-header {
+      padding: 16px 18px;
+    }
+
+    .landing-features {
+      grid-template-columns: 1fr;
+      max-width: 400px;
+    }
+
+    .landing-cta-row {
+      flex-direction: column;
+    }
+
+    .landing-cta-primary,
+    .landing-cta-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .landing-features {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 `;
 
 function mapAnswer(value, questionNumber) {
@@ -2235,6 +2537,7 @@ export default function App() {
   const [authTab, setAuthTab] = useState("login"); // "login" | "register"
   const [authForm, setAuthForm] = useState({ username: "", email: "", password: "" });
   const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
   const [authSubmitting, setAuthSubmitting] = useState(false);
 
   // Student history
@@ -2338,6 +2641,7 @@ export default function App() {
     setAuthTab(tab);
     setAuthForm({ username: "", email: "", password: "" });
     setAuthError("");
+    setAuthSuccess("");
     setIsAuthModalOpen(true);
   };
 
@@ -2348,11 +2652,13 @@ export default function App() {
   const handleAuthSubmit = async (event) => {
     event.preventDefault();
     setAuthError("");
+    setAuthSuccess("");
     setAuthSubmitting(true);
-    const url = authTab === "login" ? AUTH_LOGIN_ENDPOINT : AUTH_REGISTER_ENDPOINT;
-    const body = authTab === "login"
-      ? { username: authForm.username, password: authForm.password }
-      : { username: authForm.username, email: authForm.email, password: authForm.password };
+    const isRegister = authTab === "register";
+    const url = isRegister ? AUTH_REGISTER_ENDPOINT : AUTH_LOGIN_ENDPOINT;
+    const body = isRegister
+      ? { username: authForm.username, email: authForm.email, password: authForm.password }
+      : { username: authForm.username, password: authForm.password };
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -2365,8 +2671,17 @@ export default function App() {
         setAuthError(data.detail || "Something went wrong. Please try again.");
         return;
       }
-      setCurrentUser(data);
-      setIsAuthModalOpen(false);
+      if (isRegister) {
+        // Don't auto-login — switch to login tab with success message
+        setAuthTab("login");
+        setAuthForm({ username: authForm.username, email: "", password: "" });
+        setAuthSuccess("Account created! Please sign in with your credentials.");
+        // Log out the cookie that the backend set during registration
+        fetch(AUTH_LOGOUT_ENDPOINT, { method: "POST", credentials: "include" }).catch(() => {});
+      } else {
+        setCurrentUser(data);
+        setIsAuthModalOpen(false);
+      }
     } catch {
       setAuthError("Could not reach the server. Check your connection.");
     } finally {
@@ -2988,93 +3303,90 @@ export default function App() {
       setIsSavingTest(false);
     }
   };
-  return (
-    <div className="app-shell">
-      <style>{styles}</style>
+  // ─── Landing page (unauthenticated) ────────────────
+  if (!currentUser && !authLoading) {
+    return (
+      <div className="landing">
+        <style>{styles}</style>
 
-      <div className="app-container">
-        <header className="app-header">
+        <div className="landing-bg">
+          <div className="landing-bg-orb" />
+          <div className="landing-bg-orb" />
+          <div className="landing-bg-orb" />
+        </div>
+
+        <header className="landing-header">
           <div className="brand-mark">
             <img className="brand-logo" src="/prepmedians-logo.jpg" alt="Prepmedians" />
             <div>
-              <p className="brand-title">Prepmedians Score Report</p>
-              <p className="brand-subtitle">ACT scoring and study guidance</p>
+              <p className="brand-title" style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem", color: "var(--text)" }}>Prepmedians</p>
+            </div>
+          </div>
+          <div className="landing-header-actions">
+            <button type="button" className="landing-cta-secondary" style={{ padding: "10px 22px", fontSize: "0.9rem" }} onClick={() => openAuthModal("login")}>
+              Sign In
+            </button>
+          </div>
+        </header>
+
+        <main className="landing-hero">
+          <div className="landing-hero-content">
+            <div className="landing-badge">
+              <span className="landing-badge-dot" />
+              ACT Practice Scoring
+            </div>
+            <h1 className="landing-title">
+              Score your ACT sheet.<br />
+              <span className="landing-title-accent">Get your study plan.</span>
+            </h1>
+            <p className="landing-subtitle">
+              Upload a photo of your completed bubble sheet or type your answers.
+              Get section scores, category breakdowns, and a personalized study
+              plan in seconds.
+            </p>
+            <div className="landing-cta-row">
+              <button type="button" className="landing-cta-primary" onClick={() => openAuthModal("register")}>
+                Get Started
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+              <button type="button" className="landing-cta-secondary" onClick={() => openAuthModal("login")}>
+                I have an account
+              </button>
             </div>
           </div>
 
-          <div className="header-actions">
-            {currentUser ? (
-              <>
-                <div className="user-chip">
-                  <div className="user-avatar" aria-hidden="true">
-                    {currentUser.username.slice(0, 1).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="user-name">{currentUser.username}</p>
-                    <p className="user-role-badge">{currentUser.role}</p>
-                  </div>
-                </div>
-                {currentUser.role === "educator" && (
-                  <button
-                    type="button"
-                    className="quiet-button"
-                    onClick={() => setIsAdminOpen((c) => !c)}
-                  >
-                    {isAdminOpen ? "Close Setup" : "Test Setup"}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="quiet-button"
-                  onClick={handleUserLogout}
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : authLoading ? null : (
-              <>
-                <button
-                  type="button"
-                  className="quiet-button"
-                  onClick={() => openAuthModal("login")}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  className="primary-button"
-                  style={{ padding: "8px 18px", fontSize: "0.875rem" }}
-                  onClick={() => openAuthModal("register")}
-                >
-                  Create Account
-                </button>
-              </>
-            )}
-            {!currentUser && !authLoading && (
-              <button
-                type="button"
-                className="quiet-button"
-                style={{ marginLeft: 8, fontSize: "0.8rem" }}
-                onClick={() => {
-                  setAdminError("");
-                  setAdminSuccess("");
-                  setIsLoginModalOpen(true);
-                }}
-              >
-                Admin
-              </button>
-            )}
+          <div className="landing-features">
+            <div className="landing-feature-card">
+              <div className="landing-feature-icon" aria-hidden="true">&#x1F4F7;</div>
+              <p className="landing-feature-title">Scan or Type</p>
+              <p className="landing-feature-desc">Upload a photo of your answer sheet or enter answers manually.</p>
+            </div>
+            <div className="landing-feature-card">
+              <div className="landing-feature-icon" aria-hidden="true">&#x1F4CA;</div>
+              <p className="landing-feature-title">Instant Scores</p>
+              <p className="landing-feature-desc">Get scaled ACT scores and per-category breakdowns instantly.</p>
+            </div>
+            <div className="landing-feature-card">
+              <div className="landing-feature-icon" aria-hidden="true">&#x1F4D6;</div>
+              <p className="landing-feature-title">Study Plan</p>
+              <p className="landing-feature-desc">Receive a personalized study plan based on your weakest areas.</p>
+            </div>
           </div>
-        </header>
+        </main>
+
+        <footer className="landing-footer">
+          Prepmedians &middot; ACT practice scoring and study guidance
+        </footer>
 
         {isAuthModalOpen ? (
           <div className="auth-backdrop" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget) setIsAuthModalOpen(false); }}>
             <div className="auth-modal">
-              <button className="auth-close" aria-label="Close" onClick={() => setIsAuthModalOpen(false)}>×</button>
+              <button className="auth-close" aria-label="Close" onClick={() => setIsAuthModalOpen(false)}>&times;</button>
               <div className="auth-tabs">
                 <button className={`auth-tab ${authTab === "login" ? "active" : ""}`} onClick={() => { setAuthTab("login"); setAuthError(""); }}>Sign in</button>
-                <button className={`auth-tab ${authTab === "register" ? "active" : ""}`} onClick={() => { setAuthTab("register"); setAuthError(""); }}>Create account</button>
+                <button className={`auth-tab ${authTab === "register" ? "active" : ""}`} onClick={() => { setAuthTab("register"); setAuthError(""); setAuthSuccess(""); }}>Create account</button>
               </div>
+              {authSuccess ? <div className="message success">{authSuccess}</div> : null}
               <form className="auth-form" onSubmit={handleAuthSubmit}>
                 <div className="field">
                   <label htmlFor="auth-username">Username</label>
@@ -3092,12 +3404,88 @@ export default function App() {
                 </div>
                 {authError ? <div className="message error">{authError}</div> : null}
                 <button type="submit" className="primary-button" disabled={authSubmitting}>
-                  {authSubmitting ? "Please wait…" : authTab === "login" ? "Sign in" : "Create account"}
+                  {authSubmitting ? "Please wait\u2026" : authTab === "login" ? "Sign in" : "Create account"}
                 </button>
               </form>
             </div>
           </div>
         ) : null}
+      </div>
+    );
+  }
+
+  // ─── Auth loading state ───────────────────────────────
+  if (authLoading) {
+    return (
+      <div className="app-shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
+        <style>{styles}</style>
+        <div className="loading-ring" aria-label="Loading" />
+      </div>
+    );
+  }
+
+  // ─── Authenticated app ────────────────────────────────
+  return (
+    <div className="app-shell">
+      <style>{styles}</style>
+
+      <div className="app-container">
+        <header className="app-header">
+          <div className="brand-mark">
+            <img className="brand-logo" src="/prepmedians-logo.jpg" alt="Prepmedians" />
+            <div>
+              <p className="brand-title">Prepmedians Score Report</p>
+              <p className="brand-subtitle">ACT scoring and study guidance</p>
+            </div>
+          </div>
+
+          <div className="header-actions">
+            <div className="user-chip">
+              <div className="user-avatar" aria-hidden="true">
+                {currentUser.username.slice(0, 1).toUpperCase()}
+              </div>
+              <div>
+                <p className="user-name">{currentUser.username}</p>
+                <p className="user-role-badge">{currentUser.role}</p>
+              </div>
+            </div>
+            {isAdminAuthenticated && (
+              <div className="user-chip" style={{ background: "var(--accent-soft)" }}>
+                <div className="user-avatar" aria-hidden="true" style={{ background: "var(--accent)", color: "#fff" }}>
+                  {adminCredentials.username.trim().slice(0, 1).toUpperCase()}
+                </div>
+                <div>
+                  <p className="user-name">{adminCredentials.username.trim()}</p>
+                  <p className="user-role-badge">admin</p>
+                </div>
+              </div>
+            )}
+            {currentUser.role === "educator" && (
+              <button
+                type="button"
+                className="quiet-button"
+                onClick={() => {
+                  if (!isAdminAuthenticated) {
+                    setAdminError("");
+                    setAdminSuccess("");
+                    setIsLoginModalOpen(true);
+                  } else {
+                    setIsAdminOpen((c) => !c);
+                  }
+                }}
+              >
+                {isAdminAuthenticated ? (isAdminOpen ? "Close Setup" : "Test Setup") : "Admin Login"}
+              </button>
+            )}
+            <button
+              type="button"
+              className="quiet-button"
+              onClick={handleUserLogout}
+            >
+              Sign Out
+            </button>
+          </div>
+        </header>
 
         {(isLoading || isSavingTest) ? (
           <div className="loading-backdrop" role="dialog" aria-modal="true">
